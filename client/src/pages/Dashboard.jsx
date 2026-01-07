@@ -47,7 +47,7 @@ export default function Dashboard({ toggleTheme }) {
             <IconButton onClick={toggleTheme} sx={{ color: "white" }}><DarkModeIcon /></IconButton>
             <Button color="error" variant="contained" sx={{ ml: 2 }} onClick={() => {
               localStorage.clear();
-              window.location.href = "/auth";
+              window.location.href = "/";
             }}>Logout</Button>
           </Box>
         </CardContent>

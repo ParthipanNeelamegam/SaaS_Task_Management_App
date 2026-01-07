@@ -53,7 +53,7 @@ export default function Auth() {
     const res = await fn({ variables: { email, password } });
 
     localStorage.setItem("token", res.data[mode].token);
-    window.location.href = "/";
+    window.location.href = "/tasks";
   } catch (err) {
     setErrorMsg(err?.graphQLErrors?.[0]?.message || "Something went wrong");
   }

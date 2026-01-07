@@ -7,9 +7,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/auth" element={<Auth />} />
+        <Route path="/" element={<Auth />} />
         <Route
-          path="/"
+          path="/tasks"
           element={
             <ProtectedRoute>
               <Dashboard />

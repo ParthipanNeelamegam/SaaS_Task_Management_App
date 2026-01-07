@@ -9,7 +9,7 @@ import "./index.css";
 import { getTheme } from "./theme";
 
 const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_API_URL || "http://localhost:4000/graphql"
+  uri: import.meta.env.VITE_API_URL
 });
 
 const authLink = setContext((_, { headers }) => {
