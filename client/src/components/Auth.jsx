@@ -11,6 +11,8 @@ import {
 import { useState,useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { LOGIN, SIGNUP } from "../graphql/mutations";
+import FullPageLoader from "../components/FullPageLoader";
+
 
 export default function Auth() {
   const [email, setEmail] = useState("");
@@ -20,6 +22,8 @@ export default function Auth() {
 
   const [login, { loading: loginLoading }] = useMutation(LOGIN);
   const [signup, { loading: signupLoading }] = useMutation(SIGNUP);
+  const [pageLoading, setPageLoading] = useState(false);
+
 
   useEffect(() => {
   setEmail("");
@@ -49,12 +53,15 @@ export default function Auth() {
   }
 
   try {
+    setPageLoading(true); // 🔥 START LOADER
+
     const fn = mode === "login" ? login : signup;
     const res = await fn({ variables: { email, password } });
 
     localStorage.setItem("token", res.data[mode].token);
-    window.location.href = "/tasks";
+    window.location.href = "/tasks"; // loader stays until page loads
   } catch (err) {
+    setPageLoading(false); // ❌ stop loader on error
     setErrorMsg(err?.graphQLErrors?.[0]?.message || "Something went wrong");
   }
 };
@@ -147,6 +154,8 @@ export default function Auth() {
           </CardContent>
         </Card>
       </Box>
+      <FullPageLoader open={pageLoading} />
     </Box>
+    
   );
 }

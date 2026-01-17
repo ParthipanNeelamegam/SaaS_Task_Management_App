@@ -22,6 +22,8 @@ import { useState } from "react";
 import WeeklyChart from "../components/WeeklyChart";
 import TaskDonutChart from "../components/TaskDonutChart";
 import StatCard from "../components/StateCard";
+import FullPageLoader from "../components/FullPageLoader";
+
 
 const statusColors = {
   TODO: "default",
@@ -31,20 +33,35 @@ const statusColors = {
 
 export default function Dashboard() {
   const { data, loading, error } = useQuery(GET_TASKS);
-  const [addTask] = useMutation(ADD_TASK, { refetchQueries: [GET_TASKS] });
-  const [updateTask] = useMutation(UPDATE_TASK, { refetchQueries: [GET_TASKS] });
-  const [deleteTask] = useMutation(DELETE_TASK, { refetchQueries: [GET_TASKS] });
+
+  const [addTask] = useMutation(ADD_TASK, {
+    refetchQueries: [GET_TASKS],
+    onCompleted: () => setPageLoading(false),
+    onError: () => setPageLoading(false)
+  });
+
+  const [updateTask] = useMutation(UPDATE_TASK, {
+    refetchQueries: [GET_TASKS],
+    onCompleted: () => setPageLoading(false),
+    onError: () => setPageLoading(false)
+  });
+
+  const [deleteTask] = useMutation(DELETE_TASK, {
+    refetchQueries: [GET_TASKS],
+    onCompleted: () => setPageLoading(false),
+    onError: () => setPageLoading(false)
+  });
+
+
 
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [errors, setErrors] = useState({ title: "", date: "" });
+  const [pageLoading, setPageLoading] = useState(false);
+
 
   if (loading) {
-    return (
-      <Box minHeight="100vh" display="flex" justifyContent="center" alignItems="center">
-        <CircularProgress />
-      </Box>
-    );
+   return <FullPageLoader open />;
   }
 
   if (error) {
@@ -63,9 +80,9 @@ export default function Dashboard() {
   const todayTasks = tasks.filter(
     t => t.dueDate && new Date(t.dueDate).toDateString() === today
   );
-  const overdue = tasks.filter(
+  const overdue =  tasks.filter(
     t => t.dueDate && new Date(t.dueDate) < new Date() && t.status !== "DONE"
-  );
+  ) || 0;
 
   return (
     <Box minHeight="100vh" bgcolor="#f4f6f8">
@@ -211,7 +228,7 @@ export default function Dashboard() {
                   onClick={async () => {
                     let hasError = false;
                     const newErrors = { title: "", date: "" };
-
+                    setPageLoading(true);
                     if (!title.trim()) {
                       newErrors.title = "Task title is required";
                       hasError = true;
@@ -302,11 +319,12 @@ export default function Dashboard() {
                         <Select
                           size="small"
                           value={task.status}
-                          onChange={(e) =>
-                            updateTask({
-                              variables: { id: task.id, status: e.target.value }
-                            })
-                          }
+                        onChange={(e) => {
+                          setPageLoading(true);
+                          updateTask({
+                            variables: { id: task.id, status: e.target.value }
+                          });
+                        }}
                         >
                           <MenuItem value="TODO">TODO</MenuItem>
                           <MenuItem value="IN_PROGRESS">IN PROGRESS</MenuItem>
@@ -314,9 +332,11 @@ export default function Dashboard() {
                         </Select>
                         <Button
                           color="error"
-                          onClick={() =>
-                            deleteTask({ variables: { id: task.id } })
-                          }
+                        onClick={() => {
+                        setPageLoading(true);
+                        deleteTask({ variables: { id: task.id } });
+                      }}
+
                         >
                           Delete
                         </Button>
@@ -330,6 +350,7 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </Box>
+      <FullPageLoader open={pageLoading} />
     </Box>
   );
 }
