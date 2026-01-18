@@ -7,10 +7,11 @@ import {
   CartesianGrid,
   Tooltip
 } from "recharts";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography,useMediaQuery  } from "@mui/material";
 
 export default function WeeklyChart({ tasks }) {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   const completed = tasks.filter(t => t.status === "DONE").length;
 
@@ -32,7 +33,7 @@ export default function WeeklyChart({ tasks }) {
         Weekly Progress
       </Typography>
 
-      <ResponsiveContainer width="100%" height={220}>
+      <ResponsiveContainer width="100%" height={isMobile ? 180 : 220}>
         <AreaChart
           data={data}
           margin={{ top: 10, right: 20, left: -10, bottom: 0 }}

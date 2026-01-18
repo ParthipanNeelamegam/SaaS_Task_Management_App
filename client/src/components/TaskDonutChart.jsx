@@ -1,5 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
-import { Box, Typography, Stack } from "@mui/material";
+import { Box, Typography, Stack, useMediaQuery } from "@mui/material";
 
 export default function TaskDonutChart({ tasks }) {
   const completed = tasks.filter(t => t.status === "DONE").length;
@@ -14,29 +14,36 @@ export default function TaskDonutChart({ tasks }) {
 
   const COLORS = ["#22c55e", "#f59e0b", "#ef4444"];
 
+  // 📱 detect mobile screen
+  const isMobile = useMediaQuery("(max-width:600px)");
+
   return (
     <Box
       sx={{
         p: 2,
         borderRadius: 3,
         bgcolor: "background.paper",
-        height: "%",
+        width: "100%",   // 🔥 important
+        height: "100%",
         display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between"
+        flexDirection: "column"
       }}
     >
-      <Typography variant="h6">Task Completion</Typography>
 
+      <Typography variant="h6" mb={1}>
+        Task Completion
+      </Typography>
+
+      {/* CHART */}
       <Box sx={{ flexGrow: 1 }}>
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={isMobile ? 180 : 240}>
           <PieChart>
             <Pie
               data={pieData}
               cx="50%"
               cy="50%"
-              innerRadius={65}
-              outerRadius={95}
+              innerRadius={isMobile ? 40 : 65}
+              outerRadius={isMobile ? 70 : 95}
               paddingAngle={3}
               dataKey="value"
             >
@@ -48,10 +55,12 @@ export default function TaskDonutChart({ tasks }) {
         </ResponsiveContainer>
       </Box>
 
+      {/* LEGEND */}
       <Stack
-        direction="row"
+        direction={isMobile ? "column" : "row"}
         justifyContent="center"
-        spacing={2}
+        alignItems="center"
+        spacing={isMobile ? 0.5 : 2}
         mt={1}
       >
         <Typography variant="caption" color="#22c55e">
@@ -65,6 +74,7 @@ export default function TaskDonutChart({ tasks }) {
         </Typography>
       </Stack>
 
+      {/* FOOTER */}
       <Typography
         variant="caption"
         textAlign="center"
